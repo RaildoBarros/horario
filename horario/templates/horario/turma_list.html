@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<h4>Turmas</h4>
+<hr>
+<a href="{% url 'horario:turma_add' %}" class="pure-button btn-adicionar">Adicionar</a>
+<table class="pure-table table-list pure-table-striped">
+    <thead>
+        <tr>
+            <th>Ações</th>
+            <th>#</th>
+            <th>Curso</th>
+            <th>Turma</th>
+            <th>Turno</th>
+            <th>Disciplinas</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for turma in object_list %}
+        <tr>
+            <td>
+                <a href="{% url 'horario:turma_delete' turma.pk %}"><i class="fas fa-trash"></i></a>
+                <a href="{% url 'horario:turma_edit' turma.pk %}"><i class="fas fa-edit"></i></a>
+            </td>
+            <td>{{ turma.id }}</td>
+            <td>{{ turma.curso }}</td>
+            <td>{{ turma.nome }}</td>
+            <td>{{ turma.turno }}</td>
+            <td>
+                {% for d in turma.disciplinas.all %}
+                    <p>{{d}}</p>
+                {% endfor %}
+            </td>
+        </tr>
+    {% empty %}
+    <div class="well">
+        <h2>
+            Nenhuma turma cadastrada.
+        </h2>
+    </div>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}

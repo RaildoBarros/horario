@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<h4>Preferências</h4>
+<hr>
+<a href="{% url 'horario:preferencia_add' %}" class="pure-button btn-adicionar">Adicionar</a>
+<table class="pure-table table-list">
+    <thead>
+        <tr>
+            <th>Ações</th>
+            <th>#</th>
+            <th>Professor</th>
+            <th>Dia</th>
+            <th>Turno</th>
+            <th>Horário</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for preferencia in object_list %}
+        <tr>
+            <td>
+                <a href="{% url 'horario:preferencia_delete' preferencia.pk %}"><i class="fas fa-trash"></i></a>
+                <a href="{% url 'horario:preferencia_edit' preferencia.pk %}"><i class="fas fa-edit"></i></a>
+            </td>
+            <td>{{ preferencia.id }}</td>
+            <td>{{ preferencia.professor }}</td>
+            <td>{{ preferencia.dia }}</td>
+            <td>{{ preferencia.turno }}</td>
+            <td>{{ preferencia.horario }}</td>
+        </tr>
+    {% empty %}
+    <div class="well">
+        <h2>
+            Nenhuma preferência cadastrada.
+        </h2>
+    </div>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}

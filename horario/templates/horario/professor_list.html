@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<h4>Professores</h4>
+<hr>
+<a href="{% url 'horario:professor_add' %}" class="pure-button btn-adicionar">Adicionar</a>
+<table class="pure-table table-list pure-table-striped">
+    <thead>
+        <tr>
+            <th>Ações</th>
+            <th>#</th>
+            <th>Nome</th>
+            <th>C.H. Mínima Semanal (h)</th>
+            <th>C.H. Máxima Semanal (h)</th>
+            <th>Disciplinas</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for professor in object_list %}
+        <tr>
+            <td>
+                <a href="{% url 'horario:professor_delete' professor.pk %}"><i class="fas fa-trash"></i></a>
+                <a href="{% url 'horario:professor_edit' professor.pk %}"><i class="fas fa-edit"></i></a>
+            </td>
+            <td>{{ professor.id }}</td>
+            <td>{{ professor.nome }}</td>
+            <td>{{ professor.carga_horaria_min_semanal }}</td>
+            <td>{{ professor.carga_horaria_max_semanal }}</td>
+            <td>
+                {% for d in professor.disciplinas.all %}
+                    <p>{{d}}</p>
+                {% endfor %}
+            </td>
+        </tr>
+    {% empty %}
+    <div class="well">
+        <h2>
+            Nenhum professor cadastrado.
+        </h2>
+    </div>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<h4>Indisponibilidades</h4>
+<hr>
+<a href="{% url 'horario:indisponibilidade_add' %}" class="pure-button btn-adicionar">Adicionar</a>
+<table class="pure-table table-list">
+    <thead>
+        <tr>
+            <th>Ações</th>
+            <th>#</th>
+            <th>Professor</th>
+            <th>Dia</th>
+            <th>Turno</th>
+            <th>Horário</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for indisponibilidade in object_list %}
+        <tr>
+            <td>
+                <a href="{% url 'horario:indisponibilidade_delete' indisponibilidade.pk %}"><i class="fas fa-trash"></i></a>
+                <a href="{% url 'horario:indisponibilidade_edit' indisponibilidade.pk %}"><i class="fas fa-edit"></i></a>
+            </td>
+            <td>{{ indisponibilidade.id }}</td>
+            <td>{{ indisponibilidade.professor }}</td>
+            <td>{{ indisponibilidade.dia }}</td>
+            <td>{{ indisponibilidade.turno }}</td>
+            <td>{{ indisponibilidade.horario }}</td>
+        </tr>
+    {% empty %}
+    <div class="well">
+        <h2>
+            Nenhuma indisponibilidade cadastrada.
+        </h2>
+    </div>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}

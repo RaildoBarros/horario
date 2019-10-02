@@ -1,0 +1,61 @@
+<html>
+{% load static %}
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="{% static 'horario/img/favicon.ico' %}" />
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'horario/css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'horario/css/pure-min.css' %}" />
+    <link rel="stylesheet" href="{% static 'horario/css/style.css' %}" />
+
+	<title>Horário Acadêmico</title>
+</head>
+
+<body>
+<div class="pure-g">
+    <div id="side" class="pure-u-1-6">
+        <div id="user">
+            <i class="fas fa-user"></i>
+            <p>Usuário</p>
+        </div>
+        <hr class="hr-menu">
+        <div id="box-menu">
+            <li><i class="fas fa-home"></i><a href="{% url 'horario:index' %}">INÍCIO</a></li>
+            <li><i class="fas fa-calendar"></i><a href="{% url 'horario:gerarhorario' %}" class="top-menu">Gerar Horário</a></li>
+            <li><i class="fas fa-graduation-cap"></i><a href="{% url 'horario:cursos' %}" class="top-menu">Cursos</a></li>
+            <li><i class="fas fa-book"></i><a href="{% url 'horario:disciplinas' %}" class="top-menu">Disciplinas</a></li>
+            <li><i class="fas fa-chalkboard-teacher"></i><a href="{% url 'horario:professores' %}" class="top-menu">Professores</a></li>
+            <li><i class="fas fa-users"></i><a href="{% url 'horario:turmas' %}"  class="top-menu">Turmas</a></li>
+            <li><i class="fas fa-arrows-alt-h"></i><a href="{% url 'horario:lotacoes' %}" class="top-menu">Lotações</a></li>
+            <li><i class="fas fa-calendar-alt"></i><a href="{% url 'horario:periodosletivos' %}" class="top-menu">Períodos Letivos</a></li>
+            <li><i class="fas fa-calendar-times"></i><a href="{% url 'horario:indisponibilidades' %}" class="top-menu">Indisponibilidades</a></li>
+            <li><i class="fas fa-user-clock"></i><a href="{% url 'horario:preferencias' %}" class="top-menu">Preferências</a></li>
+            <li><i class="fas fa-calendar-minus"></i><a href="{% url 'horario:feriados' %}" class="top-menu">Feriados</a></li>
+        </div>
+    </div>
+    <div class="pure-u-5-6">
+        <div class="pure-g-r content-ribbon messages">
+            {% if messages %}
+            <aside class="pure-u-1">
+                {% for message in messages %}
+                <p>{{ message }}</p>
+                {% endfor %}
+            </aside>
+            {% endif %}
+        </div>
+        <div id="box-conteudo">
+            {% block main %}
+
+            {% endblock %}
+        </div>
+    </div>
+</div>
+<div class="footer">
+  <p>Horário Acadêmico</p>
+</div>
+
+<script src="http://yui.yahooapis.com/3.12.0/build/yui/yui-min.js"></script>
+</body>
+</html>

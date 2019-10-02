@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="index">
+    <div class="d-flex p-3 bg-light text-black-50 justify-content-around">
+        <div class="p-2">
+            <div class="wrapper">
+                <span class="display-2">{{ total_cursos }}</span>
+                <p>cursos</p>
+            </div>
+        </div>
+
+        <div class="p-2">
+            <div class="wrapper">
+               <span class="display-2">{{ total_disciplinas }}</span>
+                <p>disciplinas</p>
+            </div>
+        </div>
+
+        <div class="p-2">
+            <div class="wrapper">
+                <span class="display-2">{{ total_professores }}</span>
+                <p>professores</p>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="d-flex p-3 bg-light text-black-50 justify-content-around">
+        <div class="p-2">
+            <div class="wrapper">
+                <span class="display-2">{{ total_turmas }}</span>
+                <p>turmas</p>
+            </div>
+        </div>
+
+        <div class="p-2">
+            <div class="wrapper">
+                <span class="display-2">{{ total_indisponibilidades }}</span>
+                <p>indisponibilidades</p>
+            </div>
+        </div>
+
+        <div class="p-2">
+            <div class="wrapper">
+                <span class="display-2">{{ total_preferencias }}</span>
+                <p>preferências</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

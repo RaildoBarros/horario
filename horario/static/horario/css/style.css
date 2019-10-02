@@ -1,0 +1,149 @@
+
+.index {
+    background-color: #f6f6f6;
+    margin-top: 100px;
+}
+
+.p-2 {
+    width: 30%;
+}
+
+.wrapper {
+    background-color: #fff;
+    border-radius: 0 0 5px 5px;
+    box-shadow: 10px 10px 35px 0 rgba(0,0,0,0.05);
+    display: inline-block;
+    padding: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+.pure-g {
+    height: 100%;
+}
+
+hr {
+    border-top: 1px solid #eee;
+    margin-bottom: 30px;
+}
+
+#side {
+    background: #263238;
+}
+
+.hr-menu {
+    width: 80%;
+    border-top: 1px solid;
+    margin-bottom: 30px;
+}
+
+.messages {
+    background-color: rgb(28, 184, 65);
+    color: #fff;
+    text-align: center;
+}
+
+#box-menu {
+    color: #fff;
+    padding-left: 20px;
+}
+
+#box-menu a {
+    color: #fff;
+    text-decoration: none;
+}
+
+#box-menu li {
+    list-style-type: none;
+    margin-bottom: 20px;
+}
+
+#box-menu li i{
+   padding-right: 7px;
+}
+
+#user {
+    color: #fff;
+    text-align: center;
+    margin-top: 30px;
+}
+
+#user > i {
+    font-size: 50pt;
+}
+
+ul.breadcrumb {
+    font-size: 10pt;
+    padding: 0;
+}
+ul.breadcrumb li {
+    display: inline-block;
+}
+ul.breadcrumb li a {
+    display: inline-block;
+    text-decoration: none;
+}
+
+#box-conteudo {
+    background: #fff;
+    margin-left: 30px;
+    margin-bottom: 100px;
+    width: 90%;
+}
+
+.btn-adicionar {
+    float: right;
+    margin-bottom: 20px;
+    background: rgb(28, 184, 65); /* this is a green */
+    color: #fff;
+}
+
+.pure-button-primary {
+    margin-top: 20px;
+}
+
+.table-list {
+    width: 100%;
+}
+
+.table-list tr td a {
+    color: #000;
+}
+
+table {
+    font-size: 10pt;
+}
+
+table .semanas {
+    background-color: #455A64;
+    color: #ffffff;
+    text-align: center;
+}
+
+table .dia-semana {
+    /*background: #ffffff;*/
+    /*color: #ffffff;*/
+    border: solid 1px #ccc;
+}
+table #primeiro-horario {
+    background: #455A64;
+    color: #fff;
+}
+
+table td {
+    text-align: center;
+}
+
+table td span {
+    font-weight: bold;
+}
+
+.footer {
+   position: fixed;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   background-color: #263238;
+   color: white;
+   text-align: center;
+}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <h3>Você deseja realmente excluir o periodoletivo {{periodoletivo}}?</h3>
+        <div class="pure-control">
+            <button type="submit" class="pure-button pure-button-primary">Confirmar</button>
+            <a href="{% url 'horario:periodosletivos' %}" class="pure-button">Cancelar</a>
+        </div>
+    </form>
+
+{% endblock %}

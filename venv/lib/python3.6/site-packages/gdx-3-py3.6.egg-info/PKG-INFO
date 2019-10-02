@@ -1,0 +1,11 @@
+Metadata-Version: 1.1
+Name: gdx
+Version: 3
+Summary: GAMS Data Exchange (GDX) file access
+Home-page: https://github.com/khaeru/py-gdx
+Author: Paul Natsuo Kishimoto
+Author-email: mail@paul.kishimoto.name
+License: UNKNOWN
+Download-URL: https://github.com/khaeru/py-gdx/tarball/3
+Description: UNKNOWN
+Platform: UNKNOWN
