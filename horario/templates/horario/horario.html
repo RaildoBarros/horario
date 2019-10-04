@@ -1,5 +1,21 @@
-{% extends "base.html" %}
-{% block main %}
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+    <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'horario:index' %}">Home</a>
+</div>
+{% endblock %}
+
+{% block content %}
 {% for t in turmas %}
 <h4>Turma: {{ t }} ({{ t.turno }})</h4>
 <hr>

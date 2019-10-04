@@ -98,8 +98,9 @@ body,
     background-color:  #263238;
 }
 
-div.breadcrumbs {
-    background: #263238;
+div.breadcrumbs, div.breadcrumbs a {
+    color: #263238;
+    background: #fff;
 }
 
 .module h2, .module caption, .inline-group h2, .selector-chosen h2 {
