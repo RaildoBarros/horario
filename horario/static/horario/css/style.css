@@ -1,46 +1,33 @@
-
-.index {
-    background-color: #f6f6f6;
-    margin-top: 100px;
-}
-
-.p-2 {
-    width: 30%;
-}
-
-.wrapper {
-    background-color: #fff;
-    border-radius: 0 0 5px 5px;
-    box-shadow: 10px 10px 35px 0 rgba(0,0,0,0.05);
-    display: inline-block;
-    padding: 20px;
-    width: 100%;
-    text-align: center;
-}
-
+/*  */
+html,
+body,
 .pure-g {
+    background: #fff;
     height: 100%;
+    font-size: medium;
 }
 
-hr {
-    border-top: 1px solid #eee;
-    margin-bottom: 30px;
-}
-
-#side {
-    background: #263238;
-}
-
-.hr-menu {
-    width: 80%;
-    border-top: 1px solid;
-    margin-bottom: 30px;
-}
-
-.messages {
-    background-color: rgb(28, 184, 65);
+#user {
     color: #fff;
     text-align: center;
+    margin-top: 30px;
+}
+
+#user #foto {
+    background: #37474F;
+    height: 90px;
+    margin: 0 70px 0 70px;
+}
+
+#user #foto i {
+    margin-top: 10px;
+    font-size: 50pt;
+}
+
+.pure-u-1-6 {
+    background: #263238;
+    flex-basis: 240px;
+    min-height: 100vh;
 }
 
 #box-menu {
@@ -51,6 +38,7 @@ hr {
 #box-menu a {
     color: #fff;
     text-decoration: none;
+    font-size: medium;
 }
 
 #box-menu li {
@@ -59,91 +47,82 @@ hr {
 }
 
 #box-menu li i{
-   padding-right: 7px;
+    padding-right: 7px;
 }
 
-#user {
-    color: #fff;
-    text-align: center;
-    margin-top: 30px;
-}
-
-#user > i {
-    font-size: 50pt;
-}
-
-ul.breadcrumb {
-    font-size: 10pt;
-    padding: 0;
-}
-ul.breadcrumb li {
-    display: inline-block;
-}
-ul.breadcrumb li a {
-    display: inline-block;
-    text-decoration: none;
-}
-
-#box-conteudo {
-    background: #fff;
-    margin-left: 30px;
-    margin-bottom: 100px;
-    width: 90%;
-}
-
-.btn-adicionar {
-    float: right;
+#hr {
+    display: flex;
+    justify-content: center;
     margin-bottom: 20px;
-    background: rgb(28, 184, 65); /* this is a green */
-    color: #fff;
 }
 
-.pure-button-primary {
-    margin-top: 20px;
+.hr-menu {
+    border-top: 1px solid #616161;
+    width: 80%;
 }
 
-.table-list {
-    width: 100%;
-}
-
-.table-list tr td a {
-    color: #000;
-}
-
-table {
-    font-size: 10pt;
-}
-
-table .semanas {
-    background-color: #455A64;
-    color: #ffffff;
-    text-align: center;
-}
-
-table .dia-semana {
-    /*background: #ffffff;*/
-    /*color: #ffffff;*/
-    border: solid 1px #ccc;
-}
-table #primeiro-horario {
-    background: #455A64;
-    color: #fff;
-}
-
-table td {
-    text-align: center;
-}
-
-table td span {
-    font-weight: bold;
+.list-group li {
+    border-bottom: 1px solid #616161;
+    margin-right: 20px;
 }
 
 .footer {
-   position: fixed;
-   left: 0;
-   bottom: 0;
-   width: 100%;
-   background-color: #263238;
-   color: white;
-   text-align: center;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #263238;
+    color: white;
+    text-align: center;
+}
+
+/* */
+
+
+/* Personalizações do admin */
+#header {
+    background-color:  #fff;
+}
+
+#header #branding h1 {
+    color: #fff;
+}
+
+#user-tools,
+#header #user-tools a {
+    font-size: small;
+    color: #263238;
+}
+
+.submit-row input {
+    background-color:  #263238;
+}
+
+div.breadcrumbs {
+    background: #263238;
+}
+
+.module h2, .module caption, .inline-group h2, .selector-chosen h2 {
+    background: #263238;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+    background: green;
+}
+
+.object-tools a.addlink {
+    background-color: green;
+}
+
+a:link, a:visited {
+    color: #263238;
+}
+
+.login #content-main {
+    display: flex;
+    justify-content: center;
+}
+
+#content {
+    margin-bottom: 50px;
 }

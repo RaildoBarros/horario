@@ -29,6 +29,7 @@ class Disciplina(models.Model):
     dificil = models.BooleanField(default=False, verbose_name='Difícil')
     disciplina_estagio = models.BooleanField(default=False, verbose_name='Disciplina de Estágio')
 
+
     def __str__(self):
         return self.nome
 

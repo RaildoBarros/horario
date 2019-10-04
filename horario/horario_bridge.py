@@ -18,8 +18,8 @@ working_directory = settings.BASE_DIR
 
 if platform.system() == 'Linux':
     GAMS_PATH = '/opt/gams28.2'
-else:
-    GAMS_PATH = 'c:/GAMS'
+elif platform.system() == 'Windows':
+    GAMS_PATH = 'C:/GAMS/win64/27.2'
 
 ws = GamsWorkspace(system_directory=GAMS_PATH, working_directory=working_directory)
 
