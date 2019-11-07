@@ -28,9 +28,19 @@ class DisciplinaAdmin(admin.ModelAdmin):
    list_per_page = 20
 
 class ProfessorAdmin(admin.ModelAdmin):
+   list_display = ['nome', 'carga_horaria_min_semanal', 'carga_horaria_max_semanal', 'get_disciplinas']
    filter_horizontal = ('disciplinas',)
    search_fields = ['nome']
-   filter_horizontal = ('disciplinas',)
+
+   list_per_page = 20
+
+class PeriodoLetivoAdmin(admin.ModelAdmin):
+   list_display = ['nome','inicio','termino']
+
+   list_per_page = 20
+
+class HorarioAdmin(admin.ModelAdmin):
+   list_display = ['periodo_letivo','get_turmas','file']
 
    list_per_page = 20
 
@@ -40,6 +50,7 @@ admin.site.register(Turma, TurmaAdmin)
 admin.site.register(Curso, CursoAdmin)
 admin.site.register(Indisponibilidade)
 admin.site.register(Lotacao, LotacaoAdmin)
-admin.site.register(PeriodoLetivo)
+admin.site.register(PeriodoLetivo, PeriodoLetivoAdmin)
 admin.site.register(Feriado)
 admin.site.register(Preferencia)
+admin.site.register(Horario, HorarioAdmin)

@@ -1,4 +1,7 @@
 import os
+from ctypes import c_ubyte
+from datetime import timedelta
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'gradehoraria.settings'
 import django
 django.setup()
@@ -81,9 +84,41 @@ def teste_gams_linux():
 
     ws = GamsWorkspace(system_directory=GAMS_PATH, working_directory=working_directory)
 
+def teste_salvar_horario():
+    horario = Horario(periodo_letivo=PeriodoLetivo.objects.get(pk=1), horario='horario/files/out.gdx')
+    horario.save()
+    horario.turmas.set(turmas)
+
+    return horario.id
+
+def obter_dias(periodo_letivo):
+    dias = []
+    dias.append(periodo_letivo.inicio)
+    for dia in range((periodo_letivo.termino - periodo_letivo.inicio).days):
+        dias.append(periodo_letivo.inicio + timedelta(days=dia + 1))
+
+
+
+    print(dias[0])
+
+
+def gdx_to_base64(file):
+    import base64
+
+    xml = 'files/job.xml'
+
+    with open(file, 'rb') as file:
+        data = base64.b64encode(file.read())
+
+    string_base64 = str(data)
+    string_base64 = (string_base64 + 'b').strip("'b")
+    file.close()
+
+    lines = open(xml).readlines()
+    lines[117] = string_base64 + '\n'
+    open(xml, 'w').writelines(lines)
+
 
 ########### ÁREA DE TESTES ###########
 
-# print(horario_bridge.ler_resultado(turmas))
-# print(horario_bridge.obter_dados_gdx(7))
-# print(horario_bridge.gerar_horario(7))
+gdx_to_base64('./files/in.gdx')

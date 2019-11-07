@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.safestring import mark_safe
 from multiselectfield import MultiSelectField
 
 DIAS_DA_SEMANA = (
@@ -40,11 +41,20 @@ class Professor(models.Model):
 
     disciplinas = models.ManyToManyField(Disciplina, blank=True)
 
+    def get_disciplinas(self):
+        out = '<ul>'
+        for d in self.disciplinas.all():
+            out += '<li>' + str(d) + '</li>'
+        out += '</ul>'
+        return mark_safe(out)
+
     def __str__(self):
         return self.nome
 
     class Meta:
         verbose_name_plural = "Professores"
+
+    get_disciplinas.short_description = 'Disciplinas'
 
 class Indisponibilidade(models.Model):
     professor = models.OneToOneField(Professor, on_delete=models.CASCADE, unique=True)
@@ -64,6 +74,10 @@ class Preferencia(models.Model):
     def __str__(self):
         return self.professor.nome
 
+    class Meta:
+        verbose_name_plural = "Preferências"
+        verbose_name = "Preferência"
+
 class Curso(models.Model):
     nome = models.CharField(max_length=200)
     carga_horaria = models.PositiveIntegerField(verbose_name='Carga horária (h)')
@@ -79,7 +93,7 @@ class Turma(models.Model):
     disciplinas = models.ManyToManyField(Disciplina)
 
     def __str__(self):
-        return self.nome
+        return '{} - {}'.format(self.nome, self.curso)
 
 class Lotacao(models.Model):
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
@@ -97,8 +111,8 @@ class Lotacao(models.Model):
 
 class PeriodoLetivo(models.Model):
     nome = models.CharField(max_length=200)
-    inicio = models.DateField()
-    termino = models.DateField()
+    inicio = models.DateField(verbose_name='Início')
+    termino = models.DateField(verbose_name='Término')
 
     class Meta:
         verbose_name_plural = "Períodos Letivos"
@@ -113,9 +127,22 @@ class Feriado(models.Model):
     def __str__(self):
         return self.nome
 
-# class horario(models.Model):
-#     periodo_letivo = models.ForeignKey(PeriodoLetivo, verbose_name="Período Letivo")
-#     turma = models.ForeignKey(Turma, verbose_name="Turma")
+class Horario(models.Model):
+    periodo_letivo = models.ForeignKey(PeriodoLetivo, verbose_name="Período Letivo", on_delete=models.CASCADE)
+    turmas = models.ManyToManyField(Turma, verbose_name="Turmas")
+    file = models.FileField(verbose_name="Horário")
+
+    def get_turmas(self):
+        out = '<ul>'
+        for t in self.turmas.all():
+            out += '<li>' + str(t) + '</li>'
+        out += '</ul>'
+        return mark_safe(out)
+
+    class Meta:
+        verbose_name_plural = "Horários"
+
+    get_turmas.short_description = 'Turmas'
 
 # poll = models.ForeignKey(Poll, verbose_name="the related poll")
 # sites = models.ManyToManyField(Site, verbose_name="list of sites")

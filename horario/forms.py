@@ -58,5 +58,6 @@ class TurmaForm(forms.ModelForm):
         fields = ('curso','nome','turno','disciplinas')
 
 class GerarHorarioForm(forms.Form):
-    curso = forms.ModelChoiceField(queryset=Curso.objects.all())
+    periodo_letivo = forms.ModelChoiceField(queryset=PeriodoLetivo.objects.all())
+    turmas = forms.ModelMultipleChoiceField(queryset=Turma.objects.all(), widget=forms.CheckboxSelectMultiple)
 

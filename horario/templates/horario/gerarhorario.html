@@ -1,24 +1,11 @@
-{% extends "admin/base_site.html" %}
-{% load i18n admin_urls static %}
+{% extends "admin/base.html" %}
 
-{% block extrahead %}
-    {{ block.super }}
-    {{ media }}
-    <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
-{% endblock %}
-
-
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; <a href="{% url 'horario:index' %}">Home</a>
-</div>
-{% endblock %}
+{% load static %}
 
 {% block content %}
 <h4>Gerar Horário</h4>
 <hr>
-<form class="pure-form pure-form-stacked" method="post">
+<form class="" method="post">
     {% csrf_token %}
     <fieldset>
         {{ form.non_field_errors }}
@@ -29,9 +16,19 @@
             {{ field.errors }}
         </div>
         {% endfor %}
-        <div class="pure-controls">
-            <button type="submit" class="pure-button pure-button-primary">Gerar Horário</button>
+        <div class="">
+            <button id="gerar-horario" type="submit" class="pure-button pure-button-primary" onclick="spinner()">
+                Gerar Horário
+            </button>
         </div>
     </fieldset>
 </form>
+
+<script>
+function spinner() {
+  document.getElementById("gerar-horario").innerHTML = "<span class=\"spinner-grow spinner-grow-sm\" role=\"status\" aria-hidden=\"true\"></span>Gerando horário...";
+}
+</script>
 {% endblock %}
+
+{#<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>#}

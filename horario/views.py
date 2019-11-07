@@ -1,14 +1,24 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from datetime import timedelta
+import time
+
 from django.contrib import messages
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
+
 from . import horario_bridge
 from .forms import *
 from .models import *
 import math
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin import AdminSite
 
-template_edit = 'horario/edit.html'
+class MyAdminSite(AdminSite):
+            pass
+mysite = MyAdminSite()
 
+@login_required(redirect_field_name='next', login_url='/horario')
 def index(request):
+    username = request.user
     total_cursos = Curso.objects.all().count()
     total_disciplinas = Disciplina.objects.all().count();
     total_professores = Professor.objects.all().count()
@@ -23,412 +33,68 @@ def index(request):
         'total_turmas': total_turmas,
         'total_indisponibilidades': total_indisponibilidades,
         'total_preferencias': total_preferencias,
+        'has_permission': mysite.has_permission(request),
+        'username': username,
     }
     return render(request, template_name, context)
 
+@login_required()
 def gerarhorario(request):
     form = GerarHorarioForm()
     template_name = 'horario/gerarhorario.html'
+
     if request.method == "POST":
         form = GerarHorarioForm(request.POST)
         if form.is_valid():
-            curso_id = request.POST.dict().get('curso')
-            return redirect('horario:horario', pk=curso_id)
+            turmas = form.cleaned_data['turmas']
+            periodo_letivo = form.cleaned_data['periodo_letivo']
+            horario_id = horario_bridge.gerar_horario(turmas, periodo_letivo)
+            if horario_id:
+                messages.success(request, "Horário Gerado com sucesso!")
+                return redirect('horario:horario', pk=horario_id)
+            else:
+                messages.error(request, "Não foi possível gerar o horário!")
+
     else:
         form = GerarHorarioForm()
-    return render(request, template_name, {'form': form})
+    context = {
+        'form': form,
+        'has_permission': mysite.has_permission(request),
+    }
+    return render(request, template_name, context)
 
-def obter_semanas():
+class HorarioListView(ListView):
+    model = Horario
+
+def obter_semanas(periodo_letivo):
     semanas = []
-    periodo_letivo = PeriodoLetivo.objects.get(id=1)
     qtd_semanas = math.ceil((periodo_letivo.termino - periodo_letivo.inicio).days / 7)
     for i in range(qtd_semanas):
-        semanas.append('s'+str(i+1))
+        semanas.append((i,'s'+str(i+1)))
     return semanas
 
+def obter_segunda(periodo_letivo):
+    data = periodo_letivo.inicio
+    while data.weekday() != 0:
+        data = data - timedelta(days=1)
+    return data
+
+@login_required()
 def horario(request, pk):
-    curso = get_object_or_404(Curso, pk=pk)
-    turmas = Turma.objects.filter(curso=curso)
-    semanas = obter_semanas()
-    resultados = horario_bridge.gerar_horario(pk)
+    horario = get_object_or_404(Horario, pk=pk)
+    semanas = obter_semanas(horario.periodo_letivo)
+    dias_feriados = Feriado.objects.values_list('dia', flat=True)
+    resultado = horario_bridge.ler_resultado(horario.turmas.all(), horario.file.path)
     template_name = 'horario/horario.html'
     context = {
-        'resultados': resultados,
-        'turmas': turmas,
+        'resultado': resultado,
+        'turmas': horario.turmas.all(),
         'dias_da_semana': DIAS_DA_SEMANA,
+        'primeiro_dia': obter_segunda(horario.periodo_letivo),
         'semanas': semanas,
+        'periodo_letivo': horario.periodo_letivo,
+        'dias_feriados': dias_feriados,
+        'has_permission': mysite.has_permission(request)
     }
 
     return render(request, template_name, context)
-
-#######################################################
-class CursoListView(ListView):
-    model = Curso
-
-def curso_add(request):
-    form = CursoForm()
-    template_name = template_edit
-    if request.method == "POST":
-        form = CursoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Curso adicionado com sucesso')
-            return redirect('horario:cursos')
-    else:
-        form = CursoForm()
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def curso_edit(request, pk):
-    curso = get_object_or_404(Curso, pk=pk)
-    template_name = template_edit
-    if request.method == 'POST':
-        form = CursoForm(request.POST, instance=curso)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Curso salvo com sucesso')
-            return redirect('horario:cursos')
-    else:
-        form = CursoForm(instance=curso)
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def curso_delete(request, pk):
-    curso = get_object_or_404(Curso, pk=pk)
-    if request.method == 'POST':
-        curso.delete()
-        messages.success(request, 'O curso foi excluído com sucesso')
-        return redirect('horario:cursos')
-    template = 'horario/curso_delete.html'
-    context = {
-        'curso': curso,
-    }
-    return render(request, template, context)
-
-#######################################################
-class DisciplinaListView(ListView):
-    model = Disciplina
-
-def disciplina_add(request):
-    form = DisciplinaForm()
-    template_name = template_edit
-    if request.method == "POST":
-        form = DisciplinaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Disciplina adicionada com sucesso')
-            return redirect('horario:disciplinas')
-    else:
-        form = DisciplinaForm()
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def disciplina_edit(request, pk):
-    disciplina = get_object_or_404(Disciplina, pk=pk)
-    template_name = template_edit
-    if request.method == 'POST':
-        form = DisciplinaForm(request.POST, instance=disciplina)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Disciplina salva com sucesso')
-            return redirect('horario:disciplinas')
-    else:
-        form = DisciplinaForm(instance=disciplina)
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def disciplina_delete(request, pk):
-    disciplina = get_object_or_404(Disciplina, pk=pk)
-    if request.method == 'POST':
-        disciplina.delete()
-        messages.success(request, 'A disciplina foi excluída com sucesso')
-        return redirect('horario:disciplinas')
-    template = 'horario/disciplina_delete.html'
-    context = {
-        'disciplina': disciplina,
-    }
-    return render(request, template, context)
-
-#######################################################
-class FeriadoListView(ListView):
-    model = Feriado
-
-def feriado_add(request):
-    form = FeriadoForm()
-    template_name = template_edit
-    if request.method == "POST":
-        form = FeriadoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Feriado adicionado com sucesso')
-            return redirect('horario:feriados')
-    else:
-        form = FeriadoForm()
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def feriado_edit(request, pk):
-    feriado = get_object_or_404(Feriado, pk=pk)
-    template_name = template_edit
-    if request.method == 'POST':
-        form = FeriadoForm(request.POST, instance=feriado)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Feriado salvo com sucesso')
-            return redirect('horario:feriados')
-    else:
-        form = FeriadoForm(instance=feriado)
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def feriado_delete(request, pk):
-    feriado = get_object_or_404(Feriado, pk=pk)
-    if request.method == 'POST':
-        feriado.delete()
-        messages.success(request, 'O feriado foi excluído com sucesso')
-        return redirect('horario:feriados')
-    template = 'horario/feriado_delete.html'
-    context = {
-        'feriado': feriado,
-    }
-    return render(request, template, context)
-#######################################################
-class IndisponibilidadListView(ListView):
-    model = Indisponibilidade
-
-def indisponibilidade_add(request):
-    form = IndisponibilidadeForm()
-    template_name = template_edit
-    if request.method == "POST":
-        form = IndisponibilidadeForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Indisponibilidade adicionada com sucesso')
-            return redirect('horario:indisponibilidades')
-    else:
-        form = IndisponibilidadeForm()
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def indisponibilidade_edit(request, pk):
-    indisponibilidade = get_object_or_404(Indisponibilidade, pk=pk)
-    template_name = template_edit
-    if request.method == 'POST':
-        form = IndisponibilidadeForm(request.POST, instance=indisponibilidade)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Indisponibilidade salva com sucesso')
-            return redirect('horario:indisponibilidades')
-    else:
-        form = IndisponibilidadeForm(instance=indisponibilidade)
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def indisponibilidade_delete(request, pk):
-    indisponibilidade = get_object_or_404(Indisponibilidade, pk=pk)
-    if request.method == 'POST':
-        indisponibilidade.delete()
-        messages.success(request, 'A indisponibilidade foi excluída com sucesso')
-        return redirect('horario:indisponibilidades')
-    template = 'horario/indisponibilidade_delete.html'
-    context = {
-        'indisponibilidade': indisponibilidade,
-    }
-    return render(request, template, context)
-#######################################################
-class LotacaoListView(ListView):
-    model = Lotacao
-
-def lotacao_add(request):
-    form = LotacaoForm()
-    template_name = template_edit
-    if request.method == "POST":
-        form = LotacaoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Lotação adicionada com sucesso')
-            return redirect('horario:lotacoes')
-    else:
-        form = LotacaoForm()
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def lotacao_edit(request, pk):
-    lotacao = get_object_or_404(Lotacao, pk=pk)
-    template_name = template_edit
-    if request.method == 'POST':
-        form = LotacaoForm(request.POST, instance=lotacao)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Lotação salva com sucesso')
-            return redirect('horario:lotacoes')
-    else:
-        form = LotacaoForm(instance=lotacao)
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def lotacao_delete(request, pk):
-    lotacao = get_object_or_404(Lotacao, pk=pk)
-    if request.method == 'POST':
-        lotacao.delete()
-        messages.success(request, 'A lotação foi excluída com sucesso')
-        return redirect('horario:lotacoes')
-    template = 'horario/lotacao_delete.html'
-    context = {
-        'lotacao': lotacao,
-    }
-    return render(request, template, context)
-#######################################################
-class PeriodoLetivoListView(ListView):
-    model = PeriodoLetivo
-
-def periodoletivo_add(request):
-    form = PeriodoLetivoForm()
-    template_name = template_edit
-    if request.method == "POST":
-        form = PeriodoLetivoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Periodo Letivo adicionado com sucesso')
-            return redirect('horario:periodosletivos')
-    else:
-        form = PeriodoLetivoForm()
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def periodoletivo_edit(request, pk):
-    periodoletivo = get_object_or_404(PeriodoLetivo, pk=pk)
-    template_name = template_edit
-    if request.method == 'POST':
-        form = PeriodoLetivoForm(request.POST, instance=periodoletivo)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Períodos Letivos salva com sucesso')
-            return redirect('horario:periodosletivos')
-    else:
-        form = PeriodoLetivoForm(instance=periodoletivo)
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def periodoletivo_delete(request, pk):
-    periodoletivo = get_object_or_404(PeriodoLetivo, pk=pk)
-    if request.method == 'POST':
-        periodoletivo.delete()
-        messages.success(request, 'O período letivo foi excluído com sucesso')
-        return redirect('horario:periodosletivos')
-    template = 'horario/periodoletivo_delete.html'
-    context = {
-        'periodoletivo': periodoletivo,
-    }
-    return render(request, template, context)
-#######################################################
-class PreferenciaListView(ListView):
-    model = Preferencia
-
-def preferencia_add(request):
-    form = PreferenciaForm()
-    template_name = template_edit
-    if request.method == "POST":
-        form = PreferenciaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Preferência adicionada com sucesso')
-            return redirect('horario:preferencias')
-    else:
-        form = PreferenciaForm()
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def preferencia_edit(request, pk):
-    preferencia = get_object_or_404(Preferencia, pk=pk)
-    template_name = template_edit
-    if request.method == 'POST':
-        form = PreferenciaForm(request.POST, instance=preferencia)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Preferência salva com sucesso')
-            return redirect('horario:preferencias')
-    else:
-        form = PreferenciaForm(instance=preferencia)
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def preferencia_delete(request, pk):
-    preferencia = get_object_or_404(Preferencia, pk=pk)
-    if request.method == 'POST':
-        preferencia.delete()
-        messages.success(request, 'A preferência foi excluído com sucesso')
-        return redirect('horario:preferencias')
-    template = 'horario/preferencia_delete.html'
-    context = {
-        'preferencia': preferencia,
-    }
-    return render(request, template, context)
-#######################################################
-class ProfessorListView(ListView):
-    model = Professor
-
-def professor_add(request):
-    form = ProfessorForm()
-    template_name = template_edit
-    if request.method == "POST":
-        form = ProfessorForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Professor adicionado com sucesso')
-            return redirect('horario:professores')
-    else:
-        form = ProfessorForm()
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def professor_edit(request, pk):
-    professor = get_object_or_404(Professor, pk=pk)
-    template_name = template_edit
-    if request.method == 'POST':
-        form = ProfessorForm(request.POST, instance=professor)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Professor salvo com sucesso')
-            return redirect('horario:professores')
-    else:
-        form = ProfessorForm(instance=professor)
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def professor_delete(request, pk):
-    professor = get_object_or_404(Professor, pk=pk)
-    if request.method == 'POST':
-        professor.delete()
-        messages.success(request, 'O professor foi excluído com sucesso')
-        return redirect('horario:professores')
-    template = 'horario/professor_delete.html'
-    context = {
-        'professor': professor,
-    }
-    return render(request, template, context)
-#######################################################
-class TurmaListView(ListView):
-    model = Turma
-
-def turma_add(request):
-    form = TurmaForm()
-    template_name = template_edit
-    if request.method == "POST":
-        form = TurmaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Turma adicionada com sucesso')
-            return redirect('horario:turmas')
-    else:
-        form = TurmaForm()
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def turma_edit(request, pk):
-    turma = get_object_or_404(Turma, pk=pk)
-    template_name = template_edit
-    if request.method == 'POST':
-        form = TurmaForm(request.POST, instance=turma)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Turma salva com sucesso')
-            return redirect('horario:turmas')
-    else:
-        form = TurmaForm(instance=turma)
-    return render(request, template_name, {'form': form, 'nome': form.Meta.model.__name__})
-
-def turma_delete(request, pk):
-    turma = get_object_or_404(Turma, pk=pk)
-    if request.method == 'POST':
-        turma.delete()
-        messages.success(request, 'A turma foi excluída com sucesso')
-        return redirect('horario:turmas')
-    template = 'horario/turma_delete.html'
-    context = {
-        'turma': turma,
-    }
-    return render(request, template, context)

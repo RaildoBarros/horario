@@ -5,6 +5,12 @@ import math
 from builtins import print
 from unicodedata import normalize
 from datetime import timedelta
+
+from django.contrib import messages
+from django.contrib.sessions.backends import file
+from django.core.files import File
+from django.forms.fields import FileField
+
 from .models import *
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'gradehoraria.settings'
@@ -23,28 +29,13 @@ elif platform.system() == 'Windows':
 
 ws = GamsWorkspace(system_directory=GAMS_PATH, working_directory=working_directory)
 
-
-def remover_acentos(txt):
-    return normalize('NFKD', txt).encode('ASCII', 'ignore').decode('ASCII')
-
 # Recebe o id do curso
-def obter_dados_gdx(curso_id):
-
-    # if len(sys.argv) > 1:
-    #     ws = GamsWorkspace(system_directory=sys.argv[1])
-    # else:
-    #     ws = GamsWorkspace(working_directory="./gams_files")
-
-    # ws = GamsWorkspace(working_directory="./files")
-
-    # Pega os dados das tabelas
-    curso = Curso.objects.get(id=curso_id)
-    turmas_query = Turma.objects.filter(curso=curso)
+def obter_dados_gdx(turmas_query, periodo):
     ids_disciplinas = Lotacao.objects.values_list('disciplina', flat=True).filter(turma__in=turmas_query)
     disciplinas_query = Disciplina.objects.filter(pk__in=set(ids_disciplinas))
     ids_professores = Lotacao.objects.values_list('professor', flat=True).filter(turma__in=turmas_query)
     professores_query = Professor.objects.filter(pk__in=set(ids_professores))
-    periodo_letivo = PeriodoLetivo.objects.get(id=1)
+    periodo_letivo = PeriodoLetivo.objects.get(id=periodo.pk)
     feriados_query = Feriado.objects.all()
     disponibilidades_query = Indisponibilidade.objects.filter(professor__in=professores_query)
     preferencias_query = Preferencia.objects.filter(professor__in=professores_query)
@@ -263,7 +254,6 @@ def obter_dados_gdx(curso_id):
     for k, v in iter(preferencias.items()):
         pref.add_record(k).value = v
 
-    nome_curso = remover_acentos(curso.nome.lower().replace(" ","_"))
     db.export('horario/files/in.gdx')
 
 def send_to_neos_server():
@@ -278,7 +268,7 @@ def send_to_neos_server():
         import xmlrpclib
 
     print("Enviando para neos server...")
-    args = argparse.Namespace(action='files/job.xml', password=None, server='https://neos-server.org:3333', username=None)
+    args = argparse.Namespace(action='horario/files/job.xml', password=None, server='https://neos-server.org:3333', username=None)
 
     neos = xmlrpclib.ServerProxy(args.server)
 
@@ -323,17 +313,17 @@ def send_to_neos_server():
             print('Obtendo arquivo solução...')
             fileName = 'solver-output.zip'
             output_file = neos.getOutputFile(jobNumber, password, fileName)
-            out_zip = open('./files/out.zip', 'wb')
+            out_zip = open('horario/files/out.zip', 'wb')
             out_zip.write(output_file.data)
 
-            zip = zipfile.ZipFile('./files/out.zip')
-            zip.extractall('./files')
+            zip = zipfile.ZipFile('horario/files/out.zip')
+            zip.extractall('horario/files')
             zip.close()
 
 def gdx_to_base64(file):
     import base64
 
-    xml = 'files/job.xml'
+    xml = 'horario/files/job.xml'
 
     with open(file, 'rb') as file:
         data = base64.b64encode(file.read())
@@ -346,9 +336,9 @@ def gdx_to_base64(file):
     lines[117] = string_base64 + '\n'
     open(xml, 'w').writelines(lines)
 
-def ler_resultado(turmas):
+def ler_resultado(turmas, file):
     # add a new GamsDatabase and initialize it from the GDX file just created
-    db2 = ws.add_database_from_gdx("horario/files/out.gdx")
+    db2 = ws.add_database_from_gdx(file)
     x = dict((tuple(rec.keys), rec.level) for rec in db2["x"])
     alocacao = []
     for r in x:
@@ -358,7 +348,7 @@ def ler_resultado(turmas):
     lotacao = Lotacao.objects.filter(turma__in=turmas)
     resultado = []
     for a in alocacao:
-        for l in lotacao:
+        for l in lotacao.all():
             # if int(a[0]) == l.disciplina.pk:
             # a[0] -> disciplina
             # a[1] -> semana
@@ -367,16 +357,25 @@ def ler_resultado(turmas):
             # a[4] -> dia da semana
             if a[0] == l.disciplina.nome:
                 resultado.append([l, a[1], a[4], a[2], a[3]])
-
     return resultado;
 
-def gerar_horario(curso_id):
-    curso = Curso.objects.get(pk=curso_id)
-    turmas = Turma.objects.filter(curso=curso)
+def salve_result(turmas, periodo_letivo):
+    file = open('horario/files/out.gdx', 'rb')
+    horario = Horario()
+    horario.periodo_letivo = periodo_letivo
+    horario.file = File(file)
+    horario.save()
+    horario.turmas.set(turmas)
 
-    obter_dados_gdx(curso_id)
-    gdx_to_base64('files/in.gdx')
-    send_to_neos_server()
-    resultado = ler_resultado(turmas)
+    return horario.id
 
-    return resultado
+def gerar_horario(turmas, periodo_letivo):
+    try:
+        obter_dados_gdx(turmas, periodo_letivo)
+        gdx_to_base64('horario/files/in.gdx')
+        send_to_neos_server()
+        id = salve_result(turmas, periodo_letivo)
+    except:
+        id = False
+
+    return id

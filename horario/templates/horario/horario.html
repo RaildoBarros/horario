@@ -1,39 +1,22 @@
-{% extends "admin/base_site.html" %}
-{% load i18n admin_urls static %}
 
-{% block extrahead %}
-    {{ block.super }}
-    {{ media }}
-    <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
-{% endblock %}
-
-
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; <a href="{% url 'horario:index' %}">Home</a>
-</div>
-{% endblock %}
+{% extends "admin/base.html" %}
 
 {% block content %}
+{% load horario_extras %}
+
+<h5>Período Letivo ({{ periodo_letivo.inicio }} a {{ periodo_letivo.termino }})</h5>
 {% for t in turmas %}
 <h4>Turma: {{ t }} ({{ t.turno }})</h4>
 <hr>
-<table class="pure-table-striped">
-    <tr>
-        <th></th>
-        <th></th>
-        {% for s in semanas %}
-        <th scope="col" class="semanas">{{s}}</th>
-        {% endfor %}
-    </tr>
+<table class="striped">
     {% for j1, j2 in dias_da_semana %}
     <tr>
         <th class="dia-semana" rowspan="2">{{ j2 }}</th>
         <th id="primeiro-horario">{% if t.turno == 'M' %} 07h30 - 9h30 {% elif t.turno == 'V' %} 13h30 - 15h30 {% else %} 18h30 - 20h30 {% endif %}</th>
-        {% for s in semanas %}
+        {% for i, s in semanas %}
         <td>
-        {% for lotacao, semana, dia, turno, horario in resultados %}
+        <div style="background-color: gray; color: #fff">{{ primeiro_dia | soma_dia:j1 | soma_semana:i | date:"d/M" }}</div>
+        {% for lotacao, semana, dia, turno, horario in resultado %}
         {% if lotacao.turma == t and horario.upper == 'H1' and dia.upper == j1 and semana == s %}
         <span>{{ lotacao.disciplina }}</span> </br> {{ lotacao.professor.nome.capitalize }}
         {% endif %}
@@ -43,9 +26,14 @@
     </tr>
     <tr>
         <th>{% if t.turno == 'M' %} 09h45 - 11h345 {% elif t.turno == 'V' %} 15h45 - 17h45 {% else %} 20h45 - 22h30 {% endif %}</th>
-        {% for s in semanas %}
+        {% for i, s in semanas %}
         <td>
-        {% for lotacao, semana, dia, turno, horario in resultados %}
+        {% with dia_do_mes=primeiro_dia|soma_dia:j1|soma_semana:i %}
+        {% if dia_do_mes in dias_feriados %}
+            <div style="color: red; font-weight: bold">FERIADO</div>
+        {% endif %}
+        {% endwith %}
+        {% for lotacao, semana, dia, turno, horario in resultado %}
         {% if lotacao.turma == t and horario.upper == 'H2' and dia.upper == j1 and semana == s %}
         <span>{{ lotacao.disciplina }}</span> </br> {{ lotacao.professor.nome.capitalize }}
         {% endif %}

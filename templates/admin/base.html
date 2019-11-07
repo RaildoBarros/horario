@@ -29,51 +29,53 @@
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
       data-admin-utc-offset="{% now "Z" %}">
 
-<div class="pure-g">
-{% if user.is_active and user.is_staff %}
-    <div class="pure-u-1-6">
-        <div id="user">
-        <div id="foto" class="rounded-circle">
-            <i class="fas fa-user"></i>
-        </div>
-            <p>
-                {% block welcome-msg %}
-                    {% trans 'Welcome,' %}
-                    <strong>{% firstof user.get_short_name user.get_username %}</strong>.
-                {% endblock %}
-            </p>
-        </div>
-        <div id="hr">
-            <hr class="hr-menu">
-        </div>
-        <div id="box-menu">
-            <li><i class="fas fa-home"></i><a href="{% url 'horario:index' %}">INÍCIO</a></li>
-            <li><i class="fas fa-calendar"></i><a href="{% url 'horario:gerarhorario' %}" class="top-menu">Gerar Horário</a></li>
-            <li>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fas fa-plus"></i><a data-toggle="collapse" href="#collapse1">Cadastros</a>
-                        <div id="collapse1" class="panel-collapse collapse">
-                            <ul class="list-group ml-3">
-                                <li><i class="fas fa-graduation-cap"></i><a href="/admin/horario/curso" class="top-menu">Cursos</a></li>
-                                <li><i class="fas fa-book"></i><a href="/admin/horario/disciplina" class="top-menu">Disciplinas</a></li>
-                                <li><i class="fas fa-chalkboard-teacher"></i><a href="/admin/horario/professor" class="top-menu">Professores</a></li>
-                                <li><i class="fas fa-users"></i><a href="/admin/horario/turma"  class="top-menu">Turmas</a></li>
-                                <li><i class="fas fa-arrows-alt-h"></i><a href="/admin/horario/lotacao" class="top-menu">Lotações</a></li>
-                                <li><i class="fas fa-calendar-alt"></i><a href="/admin/horario/periodoletivo" class="top-menu">Períodos Letivos</a></li>
-                                <li><i class="fas fa-calendar-times"></i><a href="/admin/horario/indisponibilidade" class="top-menu">Indisponibilidades</a></li>
-                                <li><i class="fas fa-user-clock"></i><a href="/admin/horario/preferencia" class="top-menu">Preferências</a></li>
-                                <li><i class="fas fa-calendar-minus"></i><a href="/admin/horario/feriado" class="top-menu">Feriados</a></li>
-                            </ul>
+<div class="container-fluid">
+    {% if user.is_active and user.is_staff %}
+        <div class="row">
+        <div class="col-xs-6 col-sm-4 col-lg-2">
+            <div id="user" class="row d-flex justify-content-center">
+                <div id="foto" class="rounded-circle" align="center">
+                    <i class="fas fa-user"></i>
+                </div>
+                <p>
+                    {% block welcome-msg %}
+                        {% trans 'Welcome,' %}
+                        <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+                    {% endblock %}
+                </p>
+            </div>
+            <div id="hr">
+                <hr class="hr-menu">
+            </div>
+            <div id="box-menu">
+                <li><i class="fas fa-home"></i><a href="{% url 'horario:index' %}">INÍCIO</a></li>
+                <li><i class="fas fa-calendar"></i><a href="{% url 'horario:gerarhorario' %}">Gerar Horário</a></li>
+                <li><i class="fas fa-clock-o"></i><a href="{% url 'horario:horarios' %}">Horários</a></li>
+                <li>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fas fa-plus"></i><a data-toggle="collapse" href="#collapse1">Cadastros</a>
+                            <div id="collapse1" class="panel-collapse collapse">
+                                <ul class="list-group ml-3">
+                                    <li><i class="fas fa-graduation-cap"></i><a href="/admin/horario/curso">Cursos</a></li>
+                                    <li><i class="fas fa-book"></i><a href="/admin/horario/disciplina">Disciplinas</a></li>
+                                    <li><i class="fas fa-chalkboard-teacher"></i><a href="/admin/horario/professor">Professores</a></li>
+                                    <li><i class="fas fa-users"></i><a href="/admin/horario/turma">Turmas</a></li>
+                                    <li><i class="fas fa-arrows-alt-h"></i><a href="/admin/horario/lotacao">Lotações</a></li>
+                                    <li><i class="fas fa-calendar-alt"></i><a href="/admin/horario/periodoletivo">Períodos Letivos</a></li>
+                                    <li><i class="fas fa-calendar-times"></i><a href="/admin/horario/indisponibilidade">Indisponibilidades</a></li>
+                                    <li><i class="fas fa-user-clock"></i><a href="/admin/horario/preferencia">Preferências</a></li>
+                                    <li><i class="fas fa-calendar-minus"></i><a href="/admin/horario/feriado">Feriados</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>
+                </li>
+            </div>
         </div>
-    </div>
-{% endif %}
-    <div class="pure-u-5-6">
-        <div class="pure-g-r content-ribbon messages">
+    {% endif %}
+    <div class="col-xs-6 col-sm-8 col-lg-10">
+        <div>
             {% block messages %}
                 {% if messages %}
                     <ul class="messagelist">{% for message in messages %}
@@ -85,6 +87,7 @@
         <div id="box-conteudo">
 
             {% if not is_popup %}
+                {% if user.is_active %}
                 <!-- Header -->
                 <div id="header">
                     <div id="branding">
@@ -93,14 +96,14 @@
                     {% block usertools %}
                         {% if has_permission %}
                             <div id="user-tools">
-{#                                {% block welcome-msg %}#}
-{#                                    {% trans 'Welcome,' %}#}
-{#                                    <strong>{% firstof user.get_short_name user.get_username %}</strong>.#}
-{#                                {% endblock %}#}
+                                {#                                {% block welcome-msg %}#}
+                                {#                                    {% trans 'Welcome,' %}#}
+                                {#                                    <strong>{% firstof user.get_short_name user.get_username %}</strong>.#}
+                                {#                                {% endblock %}#}
                                 {% block userlinks %}
-{#                                    {% if site_url %}#}
-{#                                        <a href="{{ site_url }}">{% trans 'View site' %}</a> /#}
-{#                                    {% endif %}#}
+                                    {#                                    {% if site_url %}#}
+                                    {#                                        <a href="{{ site_url }}">{% trans 'View site' %}</a> /#}
+                                    {#                                    {% endif %}#}
                                     {% if user.is_active and user.is_staff %}
                                         {% url 'django-admindocs-docroot' as docsroot %}
                                         {% if docsroot %}
@@ -118,6 +121,7 @@
                     {% block nav-global %}{% endblock %}
                 </div>
                 <!-- END Header -->
+                    {% endif %}
                 {% block breadcrumbs %}
                     <div class="breadcrumbs">
                         <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
@@ -144,6 +148,7 @@
 
             {% endblock %}
         </div>
+    </div>
     </div>
 </div>
 <div class="footer">

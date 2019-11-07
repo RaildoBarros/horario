@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+
+{% load static %}
+
+{% block content %}
+<h4>Horários</h4>
+<hr>
+
+<table style="width:100%">
+  <tr>
+    <th>Ações</th>
+    <th>#</th>
+    <th>Período Letivo</th>
+    <th>Turmas</th>
+    <th>Arquivo</th>
+  </tr>
+    {% for h in object_list %}
+      <tr class="{% cycle 'row1' 'row2' %}">
+        <td style="width:50px">
+            <a href="{% url 'horario:horario' h.pk %}"><i class="fas fa-search"></i></a>
+        </td>
+        <td style="width:50px">{{ h.id }}</td>
+        <td>{{ h.periodo_letivo }}</td>
+        <td>{{ h.get_turmas }}</td>
+        <td>{{ h.file }}</td>
+      </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

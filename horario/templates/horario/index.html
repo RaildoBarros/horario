@@ -1,19 +1,7 @@
-{% extends "admin/base_site.html" %}
-{% load i18n admin_urls static %}
+{% extends "admin/base.html" %}
 
-{% block extrahead %}
-    {{ block.super }}
-    {{ media }}
-    <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
-{% endblock %}
+{% load static %}
 
-
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; <a href="{% url 'horario:index' %}">Home</a>
-</div>
-{% endblock %}
 
 {% block content %}
 <div class="index">
@@ -21,21 +9,21 @@
         <div class="p-2">
             <div class="wrapper">
                 <span class="display-2">{{ total_cursos }}</span>
-                <p>cursos</p>
+                <p><a href="/admin/horario/curso/">cursos</a></p>
             </div>
         </div>
 
         <div class="p-2">
             <div class="wrapper">
                <span class="display-2">{{ total_disciplinas }}</span>
-                <p>disciplinas</p>
+                <p><a href="/admin/horario/disciplina/">disciplinas</a></p>
             </div>
         </div>
 
         <div class="p-2">
             <div class="wrapper">
                 <span class="display-2">{{ total_professores }}</span>
-                <p>professores</p>
+                <p><a href="/admin/horario/professor/">professores</a></p>
             </div>
         </div>
 
@@ -45,21 +33,21 @@
         <div class="p-2">
             <div class="wrapper">
                 <span class="display-2">{{ total_turmas }}</span>
-                <p>turmas</p>
+                <p><a href="/admin/horario/turma/">turmas</a></p>
             </div>
         </div>
 
         <div class="p-2">
             <div class="wrapper">
                 <span class="display-2">{{ total_indisponibilidades }}</span>
-                <p>indisponibilidades</p>
+                <p><a href="/admin/horario/indisponibilidade/">indisponibilidades</a></p>
             </div>
         </div>
 
         <div class="p-2">
             <div class="wrapper">
                 <span class="display-2">{{ total_preferencias }}</span>
-                <p>preferências</p>
+                <p><a href="/admin/horario/preferencia/">preferências</a></p>
             </div>
         </div>
     </div>
